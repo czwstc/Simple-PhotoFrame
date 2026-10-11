@@ -44,7 +44,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            // R8 is off until a minified build has been verified on a device
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

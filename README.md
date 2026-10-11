@@ -1,71 +1,81 @@
 # Simple-PhotoFrame
 
-**把你的安卓平板变成老年人喜爱的电子相框。** 无需网络，也不用注册账号：相框会开一个自己的 Wi‑Fi 热点，家人用手机扫码就能把照片传进去。
+**English** | [简体中文](README.zh-CN.md)
 
-![相框轮播](docs/screenshots/frame-slideshow.jpg)
+**Turn your Android tablet into a digital photo frame your grandparents will love.** No internet and no account needed: the frame opens its own Wi‑Fi hotspot, and family members upload photos by scanning a QR code with their phone.
 
-## 为什么做它
+![Slideshow](docs/screenshots/frame-slideshow.jpg)
 
-- **老人不用学**：开机直接进入相框，没有相册、文件夹之类需要设置的东西，按 Home 键也会回到相框。
-- **家里没网也能用**：完全离线，不依赖云服务和任何账号。
-- **子女传照片很简单**：手机扫两个二维码就能上传、浏览、删除照片，手机上不用装 App。
+## Why
 
-## 功能
+- **Nothing to learn**: the tablet boots straight into the slideshow. There are no albums or folders to set up, and the Home button always leads back to the frame.
+- **Works without internet**: fully offline, with no cloud service and no account.
+- **Easy for the family**: scan two QR codes with a phone to upload, browse or delete photos. Nothing needs to be installed on the phone.
 
-- **开机即相框**：注册为桌面（HOME）。默认效果是「柔和推拉」，照片比例和屏幕不一致时，空白处用模糊背景填满。
-- **轮播设置**（点右下角的半透明 ⚙ 按钮打开）
-  - 效果：柔和推拉、淡入淡出、左右滑动、无动画、随机
-  - 间隔：5 秒到 15 分钟
-  - 顺序：随机、最新优先、最早优先
-  - 显示：完整显示（模糊背景）或铺满屏幕
-  - 左右滑动屏幕可以手动翻页
-- **时钟和日期**：显示在左下角，可以关闭。
-- **定时息屏 / 亮屏**：例如 23:00 关屏、07:00 自动亮屏。夜里有人按电源键看照片，5 分钟没有操作后会再次息屏。
-- **自动回到相框**：每 5 分钟检查一次，如果相框被别的界面（比如系统设置）挡住了，就自动切回来。屏幕关着时不会唤醒，刚离开的人也至少有 3 分钟的时间。
-- **手机传照片**：相框开启**无密码热点**，屏幕上显示 Wi‑Fi 二维码和网址二维码。
-  - 网页支持多选上传（带进度）、浏览大图、批量删除
-  - HEIC 照片自动转成 JPEG，保留拍摄时间，方向正确
-  - 同一张照片重复上传会自动跳过
-  - 20 分钟没有操作自动结束，也可以在网页或相框上点「完成」结束
-- **不需要任何权限**：照片存放在应用自己的目录里。
+## Features
 
-## 截图
+- **Boots into the frame**: registered as the home screen (launcher). The default effect is a gentle Ken Burns zoom, and photos that don't match the screen's aspect ratio get a blurred backdrop instead of black bars.
+- **Slideshow settings** (tap the translucent ⚙ button in the bottom-right corner)
+  - Effect: Ken Burns, crossfade, slide, none or random
+  - Interval: 5 seconds to 15 minutes
+  - Order: random, newest first or oldest first
+  - Display: fit with blurred backdrop, or fill the screen
+  - Swipe left or right to change photos by hand
+- **Clock and date** in the bottom-left corner, can be turned off.
+- **Scheduled screen off / on**, for example off at 23:00 and on at 07:00. If someone wakes the frame at night, it goes back to sleep after 5 idle minutes.
+- **Always back to the frame**: every 5 minutes it checks whether something else (such as system settings) is covering the frame, and brings the frame back. It never wakes a screen that is off, and anyone who has just left the frame gets at least 3 minutes.
+- **Upload from a phone**: the frame opens a **password-less hotspot** and shows a Wi‑Fi QR code plus a web page QR code.
+  - The web page supports multi-photo upload with progress, a full-size photo viewer and batch delete
+  - HEIC photos are converted to JPEG, keeping the capture date and correct orientation
+  - Re-uploading the same photo is skipped automatically
+  - The transfer ends after 20 idle minutes, or when you tap "完成" (Done) on the page or the frame
+- **No permissions needed**: photos are stored in the app's own folder.
 
-| 设置面板 | 定时息屏 |
+> The app's user interface is currently in Simplified Chinese.
+
+## Screenshots
+
+| Settings panel | Scheduled sleep |
 |---|---|
-| ![设置面板](docs/screenshots/frame-settings.jpg) | ![定时息屏](docs/screenshots/frame-settings-sleep.jpg) |
+| ![Settings panel](docs/screenshots/frame-settings.jpg) | ![Scheduled sleep](docs/screenshots/frame-settings-sleep.jpg) |
 
-| 第一次打开 | 相框上的上传二维码 |
+| First start | Upload QR code on the frame |
 |---|---|
-| ![空相框](docs/screenshots/frame-empty.jpg) | ![上传二维码](docs/screenshots/frame-transfer-qr.jpg) |
+| ![Empty frame](docs/screenshots/frame-empty.jpg) | ![Upload QR code](docs/screenshots/frame-transfer-qr.jpg) |
 
-手机上的管理页面（上传、选择删除、查看大图）：
+The phone page (upload, select to delete, photo viewer):
 
-![手机页面](docs/screenshots/phone-pages.jpg)
+![Phone page](docs/screenshots/phone-pages.jpg)
 
-## 怎么传照片
+## How to upload photos
 
-1. 点相框右下角的 ⚙，再点「**传输照片**」。
-2. 用手机相机扫左边的二维码，连接 Wi‑Fi `PhotoFrame-XXXX`（无密码）。
-3. 再扫右边的二维码打开上传页面，点「上传照片」并选择照片。
-4. 传完后点网页底部的「完成传输」或相框上的「完成」。相框会关闭热点，回到照片播放。
+1. Tap ⚙ in the bottom-right corner of the frame, then tap "**传输照片**" (Transfer photos).
+2. Scan the left QR code with the phone camera to join the Wi‑Fi `PhotoFrame-XXXX` (no password).
+3. Scan the right QR code to open the upload page, tap "上传照片" (Upload photos) and pick your photos.
+4. When you're done, tap "完成传输" (Finish transfer) at the bottom of the page, or "完成" (Done) on the frame. The frame turns the hotspot off and goes back to the slideshow.
 
-> - iPhone 的照片如果存在 iCloud 里（开启了「优化 iPhone 储存空间」），选择后手机要先下载原图，请保持移动数据开启。
-> - 少数手机连上没有互联网的 Wi‑Fi 后会优先走移动数据。如果页面打不开，可以试试暂时关闭移动数据。
+> - If your iPhone keeps photos in iCloud ("Optimize iPhone Storage"), the phone must download the originals after you pick them, so keep mobile data on.
+> - Some phones prefer mobile data when the Wi‑Fi has no internet. If the page doesn't open, try turning mobile data off for a moment.
 
-## 安装
+## Download
 
-### 编译
+Get the latest APK from [Releases](https://github.com/czwstc/Simple-PhotoFrame/releases/latest), install it on the tablet and set it as the home app (see below).
 
-需要 JDK 17 和 Android SDK（platform 34、build-tools 34）：
+> Release builds and your own debug builds are signed differently, so one can't be installed over the other: uninstall the old version first, which also removes the photos on the frame.
+
+## Installation
+
+### Build
+
+Requires JDK 17 and the Android SDK (platform 34, build-tools 34):
 
 ```bash
 ./gradlew :app:assembleDebug
 ```
 
-APK 在 `app/build/outputs/apk/debug/Simple-PhotoFrame-1.0.0-debug.apk`。release 签名见 `keystore.properties_sample`。
+The APK ends up in `app/build/outputs/apk/debug/Simple-PhotoFrame-1.0.0-debug.apk`. For release signing, see `keystore.properties_sample`.
 
-### 安装并设为桌面
+### Install and set as home app
 
 ```bash
 adb install -r app/build/outputs/apk/debug/Simple-PhotoFrame-1.0.0-debug.apk
@@ -75,51 +85,47 @@ adb install -r app/build/outputs/apk/debug/Simple-PhotoFrame-1.0.0-debug.apk
 adb shell cmd package set-home-activity com.zweichen.photoframe/.frame.FrameActivity
 ```
 
-也可以在系统设置 → 应用 → 默认应用 → 桌面里选择「Simple-PhotoFrame」。
+You can also pick "Simple-PhotoFrame" under system Settings → Apps → Default apps → Home app.
 
-### 设备要求
+### Device requirements
 
-- Android 8.0（API 26）及以上，横屏平板效果最好。
-- **推荐有 root**（很多平板、开发板的工厂固件自带 `su`）。有 root 时可以开无密码热点、真正关闭屏幕、更可靠地切回相框。
-- 没有 root 也能用：热点改用系统的「本地热点」（SSID 和密码随机，Wi‑Fi 二维码里自带密码）；定时息屏改为显示黑屏并把亮度调到最低。
-- 已在 RK3566 / Android 11 / 1280×800 的平板上实测。
+- Android 8.0 (API 26) or later; a landscape tablet works best.
+- **Root is recommended** (many tablets and dev boards ship factory firmware with `su`). With root the frame can open a password-less hotspot, really turn the screen off and reliably return to the front.
+- Without root it still works: the hotspot falls back to the system's local-only hotspot (random SSID and password, included in the Wi‑Fi QR code), and scheduled sleep shows a black screen at minimum brightness instead.
+- Tested on an RK3566 tablet with Android 11 and a 1280×800 screen.
 
-## 实现说明
+## How it works
 
-- **照片目录**：`Android/data/com.zweichen.photoframe/files/photos`。
-- **热点**：有 root 时，通过 `app_process` 以 root 身份调用系统 Wi‑Fi 服务开启开放热点。这样 SSID 准确、关闭了系统 10 分钟自动关热点，并使用出厂 MAC。失败时退回 `cmd wifi start-softap`，二维码里使用实际广播的名称。
-- **Wi‑Fi 恢复**：不支持 STA+AP 并发的芯片，传输期间会暂时断开原来的 Wi‑Fi，结束后自动恢复。
-- **上传服务**：基于 NanoHTTPD，端口 8080，网页是单个 HTML 文件，不依赖任何 CDN。
-  - `PUT /api/upload?name=` 上传，请求体是原始文件字节
-  - `GET /api/photos` 照片列表，`GET /api/thumb/<文件名>` 缩略图，`GET /api/photo/<文件名>` 原图
-  - `POST /api/delete` 删除，请求体 `{"names": [...]}`
-  - `POST /api/finish` 结束传输
-- **诊断日志**：每次传输的请求、上传结果和网页端事件都记录在 `files/transfer.log`，方便排查某台手机传不上的问题。
+- **Photo folder**: `Android/data/com.zweichen.photoframe/files/photos`.
+- **Hotspot**: with root, the frame runs a small helper through `app_process` as root that asks the system Wi‑Fi service for an open hotspot. This gives an exact SSID, no 10-minute auto shutdown, and the factory MAC address. If that fails it falls back to `cmd wifi start-softap`, and the QR code always uses the SSID actually on air.
+- **Wi‑Fi recovery**: chips without STA+AP concurrency drop the regular Wi‑Fi connection during a transfer and reconnect afterwards.
+- **Upload server**: NanoHTTPD on port 8080. The web page is a single HTML file with no CDN dependencies.
+  - `PUT /api/upload?name=` uploads one photo; the request body is the raw file
+  - `GET /api/photos` lists photos, `GET /api/thumb/<name>` returns a thumbnail, `GET /api/photo/<name>` returns the original
+  - `POST /api/delete` deletes photos, with body `{"names": [...]}`
+  - `POST /api/finish` ends the transfer
+- **Diagnostic log**: requests, upload results and events from the phone page are written to `files/transfer.log`, which helps when a particular phone can't upload.
 
-## 调试
+## Debugging
 
-debug 版本支持两个只在调试时生效的参数。不开热点，直接在当前局域网启动上传服务：
+Debug builds accept two switches that are ignored in release builds. Serve on the current network without opening a hotspot:
 
 ```bash
 adb shell "su 0 am start -n com.zweichen.photoframe/.transfer.TransferActivity --ez skip_hotspot true"
 ```
 
-把空闲自动结束的时间缩短到 90 秒：
+End the transfer after 90 idle seconds instead of 20 minutes:
 
 ```bash
 adb shell "su 0 am start -n com.zweichen.photoframe/.transfer.TransferActivity --ei idle_timeout_sec 90"
 ```
 
-查看传输日志：
+Read the transfer log:
 
 ```bash
 adb shell run-as com.zweichen.photoframe cat files/transfer.log
 ```
 
-## English
+## License
 
-Simple-PhotoFrame turns an Android tablet into an offline digital photo frame for elderly users. It boots straight into a slideshow, with nothing to set up. To add photos, the frame opens its own password-less Wi‑Fi hotspot: scan the QR codes on screen with a phone, then upload, browse or delete photos in the browser. Other features are transition effects, a clock overlay, scheduled screen off/on and an automatic return to the frame. Root is recommended, for the open hotspot and real screen off; without root it falls back to the system local-only hotspot.
-
-## 许可
-
-本项目由 [Simple Gallery](https://github.com/SimpleMobileTools/Simple-Gallery) 改造而来，沿用 [GPL-3.0](LICENSE) 许可。
+Simple-PhotoFrame is based on [Simple Gallery](https://github.com/SimpleMobileTools/Simple-Gallery) and is licensed under [GPL-3.0](LICENSE).
