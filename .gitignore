@@ -1,15 +1,17 @@
-*.iml
+# Gradle / build output
+.gradle/
+build/
+*.apk
 *.aab
-.gradle
-/local.properties
-/.idea/
-.DS_Store
-/build
-/captures
+
+# Local machine config
+local.properties
 keystore.jks
 keystore.properties
-/app/src/proprietary/assets/pesdk_android_license
-/app/src/proprietary/assets/vesdk_android_license
-fastlane/fastlane.json
-Gemfile
-Gemfile.lock
+
+# IDEs / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+/captures

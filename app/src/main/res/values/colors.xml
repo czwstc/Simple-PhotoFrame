@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="crop_image_view_background">#BB000000</color>
-    <color name="circle_black_background">#66000000</color>
+    <color name="ic_launcher_background">#F57C00</color>
+    <color name="accent">#4F8CFF</color>
+    <color name="panel_background">#F0181A1F</color>
+    <color name="card_background">#FF1C1F24</color>
+    <color name="screen_background">#FF101215</color>
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#B3FFFFFF</color>
+    <color name="text_hint">#80FFFFFF</color>
+    <color name="divider">#26FFFFFF</color>
 </resources>

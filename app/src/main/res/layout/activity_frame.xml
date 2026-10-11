@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <FrameLayout
+        android:id="@+id/stage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.zweichen.photoframe.frame.SlideLayer
+            android:id="@+id/layerA"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.zweichen.photoframe.frame.SlideLayer
+            android:id="@+id/layerB"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical">
+
+        <TextClock
+            android:id="@+id/clockTime"
+            style="@style/FrameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:format12Hour="HH:mm"
+            android:format24Hour="HH:mm"
+            android:includeFontPadding="false"
+            android:textSize="72sp" />
+
+        <TextView
+            android:id="@+id/clockDate"
+            style="@style/FrameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textSize="22sp"
+            tools:text="10月11日 星期日" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/emptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:alpha="0.5"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_photo_frame" />
+
+        <TextView
+            style="@style/FrameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/empty_title"
+            android:textSize="30sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/empty_hint"
+            android:textColor="@color/text_secondary"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/emptyTransferButton"
+            style="@style/PrimaryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:minWidth="220dp"
+            android:text="@string/transfer_photos" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/settingsButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:alpha="0.45"
+        android:background="@drawable/bg_settings_button"
+        android:contentDescription="@string/settings"
+        android:padding="14dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_settings" />
+
+    <include
+        android:id="@+id/settingsPanel"
+        layout="@layout/view_settings_panel" />
+
+    <View
+        android:id="@+id/sleepOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+</FrameLayout>

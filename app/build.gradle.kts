@@ -1,14 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileInputStream
-
-val isProprietary = gradle.startParameter.taskNames.any { task -> task.contains("Proprietary") }
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android)
     alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.imgly).apply(false)
 }
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -18,15 +14,16 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdk = project.libs.versions.app.build.compileSDKVersion.get().toInt()
+    compileSdk = libs.versions.app.build.compileSDKVersion.get().toInt()
+    namespace = libs.versions.app.version.appId.get()
 
     defaultConfig {
         applicationId = libs.versions.app.version.appId.get()
-        minSdk = project.libs.versions.app.build.minimumSDK.get().toInt()
-        targetSdk = project.libs.versions.app.build.targetSDK.get().toInt()
-        versionName = project.libs.versions.app.version.versionName.get()
-        versionCode = project.libs.versions.app.version.versionCode.get().toInt()
-        setProperty("archivesBaseName", "gallery-$versionCode")
+        minSdk = libs.versions.app.build.minimumSDK.get().toInt()
+        targetSdk = libs.versions.app.build.targetSDK.get().toInt()
+        versionName = libs.versions.app.version.versionName.get()
+        versionCode = libs.versions.app.version.versionCode.get().toInt()
+        setProperty("archivesBaseName", "Simple-PhotoFrame-$versionName")
     }
 
     signingConfigs {
@@ -46,10 +43,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            // we cannot change the original package name, else PhotoEditorSDK won't work
-            //applicationIdSuffix = ".debug"
-        }
         release {
             isMinifyEnabled = true
             proguardFiles(
@@ -62,75 +55,34 @@ android {
         }
     }
 
-    flavorDimensions.add("licensing")
-    productFlavors {
-        register("proprietary")
-        register("foss")
-        register("prepaid")
-    }
-
     sourceSets {
         getByName("main").java.srcDirs("src/main/kotlin")
-        if (isProprietary) {
-            getByName("main").java.srcDirs("src/proprietary/kotlin")
-        }
     }
 
     compileOptions {
-        val currentJavaVersionFromLibs = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get().toString())
+        val currentJavaVersionFromLibs = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get())
         sourceCompatibility = currentJavaVersionFromLibs
         targetCompatibility = currentJavaVersionFromLibs
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = project.libs.versions.app.build.kotlinJVMTarget.get()
+        kotlinOptions.jvmTarget = libs.versions.app.build.kotlinJVMTarget.get()
     }
-
-    namespace = libs.versions.app.version.appId.get()
 
     lint {
         checkReleaseBuilds = false
         abortOnError = false
     }
-
-    packagingOptions {
-        resources {
-            excludes += "META-INF/library_release.kotlin_module"
-        }
-    }
 }
 
 dependencies {
-    implementation(libs.simple.tools.commons)
-    implementation(libs.android.image.cropper)
-    implementation(libs.exif)
-    implementation(libs.android.gif.drawable)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.sdk.panowidget)
-    implementation(libs.sdk.videowidget)
-    implementation(libs.sanselan)
-    implementation(libs.imagefilters)
-    implementation(libs.androidsvg.aar)
-    implementation(libs.gestureviews)
-    implementation(libs.subsamplingscaleimageview)
-    implementation(libs.androidx.swiperefreshlayout)
-    implementation(libs.awebp)
-    implementation(libs.apng)
-    implementation(libs.okio)
-    implementation(libs.picasso) {
-        exclude(group = "com.squareup.okhttp3", module = "okhttp")
-    }
-    compileOnly(libs.okhttp)
-
-    ksp(libs.glide.compiler)
-    implementation(libs.zjupure.webpdecoder)
-
-    implementation(libs.bundles.room)
-    ksp(libs.androidx.room.compiler)
-}
-
-// Apply the PESDKPlugin
-if (isProprietary) {
-    apply(from = "../gradle/imglysdk.gradle")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.exifinterface)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.glide)
+    implementation(libs.nanohttpd)
+    implementation(libs.zxing.core)
 }

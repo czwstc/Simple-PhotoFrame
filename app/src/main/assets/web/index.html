@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>相框照片</title>
+<style>
+  :root {
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #15171a;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --accent: #2f6fed;
+    --accent-press: #2559c4;
+    --danger: #e5484d;
+    --overlay: rgba(0, 0, 0, .97);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1012;
+      --card: #1b1d21;
+      --text: #f2f3f5;
+      --muted: #9aa0a8;
+      --line: #2b2e33;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+
+  header {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  header .wrap { display: flex; align-items: center; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
+  .title { flex: 1; min-width: 0; }
+  .title h1 { margin: 0; font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .title p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 40px; padding: 0 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--line); font-size: 15px;
+  }
+  .btn:active { opacity: .7; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:active { background: var(--accent-press); }
+  .btn.danger { color: var(--danger); }
+  .btn.danger.solid { background: var(--danger); border-color: var(--danger); color: #fff; }
+  .btn[disabled] { opacity: .45; pointer-events: none; }
+
+  .upload {
+    margin-top: 16px; background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--line); padding: 16px;
+  }
+  /* the real file input sits transparently on top of the button, so the tap always lands on it (iOS) */
+  .pick { position: relative; overflow: hidden; border-radius: 12px; }
+  .pick .big {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    min-height: 60px; border-radius: 12px; background: var(--accent); color: #fff;
+    font-size: 18px; font-weight: 600; user-select: none; -webkit-user-select: none;
+  }
+  .pick:active .big { background: var(--accent-press); }
+  .pick input {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer; font-size: 100px; margin: 0; padding: 0;
+  }
+  .upload .hint.ios { display: none; }
+  body.ios .upload .hint.ios { display: block; }
+  .upload .hint { margin: 10px 2px 0; color: var(--muted); font-size: 13px; text-align: center; }
+  .progress { margin-top: 14px; display: none; }
+  .progress.show { display: block; }
+  .progress .row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+  .progress .row span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 8px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .2s; }
+  .errors { margin: 10px 0 0; padding: 0; list-style: none; color: var(--danger); font-size: 13px; }
+
+  .toolbar { display: flex; align-items: center; gap: 8px; margin: 22px 0 10px; }
+  .toolbar h2 { flex: 1; margin: 0; font-size: 17px; }
+  .toolbar .sel { display: none; gap: 8px; }
+  body.selecting .toolbar .sel { display: flex; }
+  body.selecting .toolbar .normal { display: none; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  @media (min-width: 600px) { .grid { grid-template-columns: repeat(5, 1fr); gap: 6px; } }
+  .tile {
+    position: relative; aspect-ratio: 1 / 1; overflow: hidden; border-radius: 6px;
+    background: var(--line); padding: 0;
+  }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile .check {
+    position: absolute; right: 6px; top: 6px; width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid #fff; background: rgba(0, 0, 0, .25); display: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+  }
+  body.selecting .tile .check { display: block; }
+  .tile.on .check { background: var(--accent); }
+  .tile.on .check::after {
+    content: ""; position: absolute; left: 6px; top: 2px; width: 6px; height: 11px;
+    border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .tile.on img { opacity: .75; }
+  .empty { text-align: center; color: var(--muted); padding: 48px 0; display: none; }
+
+  .finish { margin-top: 28px; display: flex; justify-content: center; }
+  .finish .btn { min-width: 220px; min-height: 48px; }
+
+  .viewer {
+    position: fixed; inset: 0; z-index: 20; background: var(--overlay); color: #fff;
+    display: none; flex-direction: column;
+  }
+  .viewer.show { display: flex; }
+  .viewer .top, .viewer .bottom {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  }
+  .viewer .top { padding-top: calc(12px + env(safe-area-inset-top)); }
+  .viewer .bottom { justify-content: center; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .viewer .top span { flex: 1; font-size: 15px; opacity: .85; }
+  .viewer .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+  .viewer .stage img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .viewer .nav {
+    position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px;
+    font-size: 30px; color: #fff; opacity: .7;
+  }
+  .viewer .nav.prev { left: 4px; }
+  .viewer .nav.next { right: 4px; }
+  .viewer .btn { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .18); color: #fff; }
+  .viewer .btn.danger { color: #ff8b8e; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom)); z-index: 30;
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    background: rgba(20, 20, 22, .92); color: #fff; padding: 10px 16px; border-radius: 10px;
+    font-size: 14px; max-width: calc(100% - 32px); transition: all .25s;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .done {
+    position: fixed; inset: 0; z-index: 40; background: var(--bg); display: none;
+    align-items: center; justify-content: center; text-align: center; padding: 24px;
+  }
+  .done.show { display: flex; }
+  .done h2 { margin: 0 0 8px; }
+  .done p { margin: 0; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="title">
+      <h1 id="frameName">相框</h1>
+      <p id="stats">正在连接相框…</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="upload">
+    <div class="pick">
+      <span class="big">＋ 上传照片</span>
+      <input id="picker" type="file" accept="image/*" multiple aria-label="上传照片">
+    </div>
+    <p class="hint">可以一次选择多张，照片会立刻出现在相框上</p>
+    <p class="hint ios">照片如果存在 iCloud 里，选择后手机要先下载原图，请保持移动数据开启</p>
+    <div class="progress" id="progress">
+      <div class="row"><span id="progressName"></span><span id="progressCount"></span></div>
+      <div class="bar"><i id="progressBar"></i></div>
+      <ul class="errors" id="errors"></ul>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <h2>相框里的照片</h2>
+    <div class="normal"><button class="btn" id="selectBtn">选择</button></div>
+    <div class="sel">
+      <button class="btn" id="allBtn">全选</button>
+      <button class="btn danger solid" id="deleteBtn" disabled>删除</button>
+      <button class="btn" id="cancelBtn">取消</button>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty">相框里还没有照片，点上面的按钮上传吧</p>
+
+  <div class="finish"><button class="btn" id="finishBtn">完成传输</button></div>
+</main>
+
+<div class="viewer" id="viewer">
+  <div class="top">
+    <span id="viewerCount"></span>
+    <button class="btn" id="viewerClose">关闭</button>
+  </div>
+  <div class="stage" id="viewerStage">
+    <img id="viewerImg" alt="">
+    <button class="nav prev" id="viewerPrev" aria-label="上一张">‹</button>
+    <button class="nav next" id="viewerNext" aria-label="下一张">›</button>
+  </div>
+  <div class="bottom">
+    <button class="btn danger" id="viewerDelete">删除这张</button>
+  </div>
+</div>
+
+<div class="done" id="done">
+  <div>
+    <h2>传输已结束</h2>
+    <p>相框已回到照片播放，可以断开相框的 Wi‑Fi 了</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var photos = [];
+  var selected = new Set();
+  var selecting = false;
+  var viewerIndex = -1;
+  var uploadQueue = [];
+  var uploading = false;
+  var batch = { total: 0, done: 0, saved: 0, duplicate: 0, failed: 0 };
+  var refreshTimer = null;
+
+  function enc(name) { return encodeURIComponent(name); }
+
+  // Sends what happens on this page to the frame's diagnostic log.
+  function report(event, detail) {
+    try {
+      var body = JSON.stringify({ event: event, detail: detail || null });
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/log');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(body);
+    } catch (err) { }
+  }
+
+  window.addEventListener('error', function (e) {
+    report('js-error', { message: String(e.message), line: e.lineno, col: e.colno });
+    toast('页面出错：' + e.message);
+  });
+
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+    document.body.classList.add('ios');
+  }
+  report('page', { ua: navigator.userAgent, width: window.innerWidth });
+
+  function toast(text) {
+    var t = $('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+
+  function getJson(url, options) {
+    return fetch(url, options).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+        return data;
+      });
+    });
+  }
+
+  function refresh() {
+    return Promise.all([getJson('/api/info'), getJson('/api/photos')]).then(function (r) {
+      var info = r[0];
+      photos = r[1];
+      $('frameName').textContent = info.name || '相框';
+      document.title = info.name || '相框照片';
+      $('stats').textContent = '共 ' + photos.length + ' 张照片 · 剩余空间 ' + info.freeText;
+      var names = new Set(photos.map(function (p) { return p.name; }));
+      selected.forEach(function (n) { if (!names.has(n)) selected.delete(n); });
+      renderGrid();
+    }).catch(function () {
+      $('stats').textContent = '连接不上相框，请确认手机连着相框的 Wi‑Fi';
+    });
+  }
+
+  function scheduleRefresh() {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(refresh, 600);
+  }
+
+  function renderGrid() {
+    var grid = $('grid');
+    var existing = {};
+    Array.prototype.forEach.call(grid.children, function (el) { existing[el.dataset.key] = el; });
+    var frag = document.createDocumentFragment();
+    photos.forEach(function (p, i) {
+      var key = p.name + '|' + p.modified;
+      var tile = existing[key];
+      if (!tile) {
+        tile = document.createElement('button');
+        tile.className = 'tile';
+        tile.dataset.key = key;
+        var img = document.createElement('img');
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = '';
+        img.src = '/api/thumb/' + enc(p.name) + '?v=' + p.modified;
+        var check = document.createElement('span');
+        check.className = 'check';
+        tile.appendChild(img);
+        tile.appendChild(check);
+      }
+      tile.dataset.name = p.name;
+      tile.dataset.index = i;
+      tile.classList.toggle('on', selected.has(p.name));
+      frag.appendChild(tile);
+    });
+    grid.innerHTML = '';
+    grid.appendChild(frag);
+    $('empty').style.display = photos.length ? 'none' : 'block';
+    updateSelectionUi();
+  }
+
+  $('grid').addEventListener('click', function (e) {
+    var tile = e.target.closest('.tile');
+    if (!tile) return;
+    var name = tile.dataset.name;
+    if (selecting) {
+      if (selected.has(name)) selected.delete(name); else selected.add(name);
+      tile.classList.toggle('on', selected.has(name));
+      updateSelectionUi();
+    } else {
+      openViewer(Number(tile.dataset.index));
+    }
+  });
+
+  function setSelecting(on) {
+    selecting = on;
+    if (!on) selected.clear();
+    document.body.classList.toggle('selecting', on);
+    renderGrid();
+  }
+
+  function updateSelectionUi() {
+    var btn = $('deleteBtn');
+    btn.textContent = selected.size ? '删除 ' + selected.size + ' 张' : '删除';
+    btn.disabled = selected.size === 0;
+    $('allBtn').textContent = selected.size === photos.length && photos.length ? '全不选' : '全选';
+  }
+
+  $('selectBtn').onclick = function () { setSelecting(true); };
+  $('cancelBtn').onclick = function () { setSelecting(false); };
+  $('allBtn').onclick = function () {
+    if (selected.size === photos.length) selected.clear();
+    else photos.forEach(function (p) { selected.add(p.name); });
+    renderGrid();
+  };
+  $('deleteBtn').onclick = function () {
+    var names = Array.from(selected);
+    if (!names.length || !confirm('确定从相框删除这 ' + names.length + ' 张照片吗？删除后无法恢复。')) return;
+    deletePhotos(names).then(function () { setSelecting(false); });
+  };
+
+  function deletePhotos(names) {
+    return getJson('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ names: names })
+    }).then(function (r) {
+      toast('已删除 ' + r.deleted + ' 张照片');
+      return refresh();
+    }).catch(function (err) { toast('删除失败：' + err.message); });
+  }
+
+  // ---------- viewer ----------
+  function openViewer(index) {
+    viewerIndex = index;
+    $('viewer').classList.add('show');
+    showViewerPhoto();
+  }
+
+  function closeViewer() {
+    $('viewer').classList.remove('show');
+    $('viewerImg').removeAttribute('src');
+    viewerIndex = -1;
+  }
+
+  function showViewerPhoto() {
+    var p = photos[viewerIndex];
+    if (!p) { closeViewer(); return; }
+    var img = $('viewerImg');
+    img.src = '/api/thumb/' + enc(p.name) + '?v=' + p.modified;
+    var full = new Image();
+    full.onload = function () { if (photos[viewerIndex] === p) img.src = full.src; };
+    full.src = '/api/photo/' + enc(p.name) + '?v=' + p.modified;
+    $('viewerCount').textContent = (viewerIndex + 1) + ' / ' + photos.length;
+    $('viewerPrev').style.visibility = viewerIndex > 0 ? 'visible' : 'hidden';
+    $('viewerNext').style.visibility = viewerIndex < photos.length - 1 ? 'visible' : 'hidden';
+  }
+
+  function stepViewer(delta) {
+    var next = viewerIndex + delta;
+    if (next >= 0 && next < photos.length) { viewerIndex = next; showViewerPhoto(); }
+  }
+
+  $('viewerClose').onclick = closeViewer;
+  $('viewerPrev').onclick = function () { stepViewer(-1); };
+  $('viewerNext').onclick = function () { stepViewer(1); };
+  $('viewerDelete').onclick = function () {
+    var p = photos[viewerIndex];
+    if (!p || !confirm('确定从相框删除这张照片吗？删除后无法恢复。')) return;
+    var keep = viewerIndex;
+    deletePhotos([p.name]).then(function () {
+      if (!photos.length) { closeViewer(); return; }
+      viewerIndex = Math.min(keep, photos.length - 1);
+      showViewerPhoto();
+    });
+  };
+  (function () {
+    var startX = null;
+    var stage = $('viewerStage');
+    stage.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (startX === null) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 50) stepViewer(dx < 0 ? 1 : -1);
+    });
+  })();
+
+  // ---------- upload ----------
+  $('picker').addEventListener('click', function () { report('picker-open'); });
+
+  $('picker').addEventListener('change', function (e) {
+    var files = Array.prototype.slice.call(e.target.files || []);
+    report('picked', {
+      count: files.length,
+      files: files.slice(0, 10).map(function (f) { return { name: f.name, type: f.type, size: f.size }; })
+    });
+    e.target.value = '';
+    if (!files.length) {
+      toast('没有选到照片');
+      return;
+    }
+    if (!uploading) batch = { total: 0, done: 0, saved: 0, duplicate: 0, failed: 0 };
+    if (!uploading) $('errors').innerHTML = '';
+    batch.total += files.length;
+    uploadQueue = uploadQueue.concat(files);
+    $('progress').classList.add('show');
+    $('progressName').textContent = '已选择 ' + files.length + ' 张，开始上传…';
+    if (!uploading) nextUpload();
+  });
+
+  function setProgress(name, fileFraction) {
+    $('progressName').textContent = name;
+    $('progressCount').textContent = Math.min(batch.done + 1, batch.total) + ' / ' + batch.total;
+    var overall = (batch.done + fileFraction) / batch.total;
+    $('progressBar').style.width = Math.round(overall * 100) + '%';
+  }
+
+  function addError(name, message) {
+    var li = document.createElement('li');
+    li.textContent = name + '：' + message;
+    $('errors').appendChild(li);
+  }
+
+  function nextUpload() {
+    var file = uploadQueue.shift();
+    if (!file) {
+      uploading = false;
+      $('progressName').textContent = '上传完成';
+      $('progressCount').textContent = batch.total + ' / ' + batch.total;
+      $('progressBar').style.width = '100%';
+      var parts = ['已上传 ' + batch.saved + ' 张'];
+      if (batch.duplicate) parts.push(batch.duplicate + ' 张已存在，已跳过');
+      if (batch.failed) parts.push(batch.failed + ' 张失败');
+      toast(parts.join('，'));
+      refresh();
+      return;
+    }
+    uploading = true;
+    var started = Date.now();
+    sendFile(file, 1).then(function (result) {
+      report('upload', {
+        name: file.name, type: file.type, size: file.size, ms: Date.now() - started,
+        ok: result.ok, status: result.status || null, error: result.error || null
+      });
+      batch.done++;
+      if (result.ok && result.status === 'duplicate') batch.duplicate++;
+      else if (result.ok) batch.saved++;
+      else { batch.failed++; addError(file.name, result.error); }
+      scheduleRefresh();
+      nextUpload();
+    });
+  }
+
+  function sendFile(file, retries) {
+    return new Promise(function (resolve) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('PUT', '/api/upload?name=' + enc(file.name || 'photo.jpg'));
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) setProgress(file.name, e.loaded / e.total);
+      };
+      xhr.onload = function () {
+        var data = {};
+        try { data = JSON.parse(xhr.responseText); } catch (err) { }
+        if (xhr.status === 200 && data.ok) resolve({ ok: true, status: data.status });
+        else resolve({ ok: false, error: data.error || ('HTTP ' + xhr.status) });
+      };
+      xhr.onerror = xhr.ontimeout = function () {
+        if (retries > 0) resolve(sendFile(file, retries - 1));
+        else resolve({ ok: false, error: '网络中断' });
+      };
+      setProgress(file.name, 0);
+      xhr.send(file);
+    });
+  }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (uploading) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  // ---------- finish ----------
+  $('finishBtn').onclick = function () {
+    if (uploading && !confirm('还有照片在上传，确定要结束吗？')) return;
+    if (!uploading && !confirm('结束传输后，相框会关闭 Wi‑Fi 热点并回到照片播放。')) return;
+    fetch('/api/finish', { method: 'POST' }).catch(function () { });
+    $('done').classList.add('show');
+  };
+
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) refresh();
+  });
+
+  // keep the transfer session alive while this page is open
+  setInterval(function () {
+    if (!document.hidden && !$('done').classList.contains('show')) fetch('/api/info').catch(function () { });
+  }, 60000);
+
+  refresh();
+})();
+</script>
+</body>
+</html>

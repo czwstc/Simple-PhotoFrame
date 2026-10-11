@@ -1,23 +1,17 @@
--keep class com.simplemobiletools.** { *; }
--dontwarn android.graphics.Canvas
--dontwarn com.simplemobiletools.**
--dontwarn org.apache.**
+# NanoHTTPD
+-keep class fi.iki.elonen.** { *; }
+-dontwarn fi.iki.elonen.**
 
-# Picasso
--dontwarn javax.annotation.**
--keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
--dontwarn org.codehaus.mojo.animal_sniffer.*
--dontwarn okhttp3.internal.platform.ConscryptPlatform
-
--keepclassmembers class * implements android.os.Parcelable {
-    static ** CREATOR;
+# Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep class * extends com.bumptech.glide.module.AppGlideModule { <init>(...); }
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
 }
 
-# RenderScript
--keepclasseswithmembernames class * {
-native <methods>;
-}
--keep class androidx.renderscript.** { *; }
+# Run as root through app_process
+-keep class com.zweichen.photoframe.util.RootWifi { public static void main(java.lang.String[]); }
 
-# Reprint
--keep class com.github.ajalt.reprint.module.** { *; }
+# ZXing
+-dontwarn com.google.zxing.**
