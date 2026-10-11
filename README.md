@@ -75,7 +75,7 @@ adb install -r app/build/outputs/apk/debug/Simple-PhotoFrame-1.0.0-debug.apk
 adb shell cmd package set-home-activity com.zweichen.photoframe/.frame.FrameActivity
 ```
 
-也可以在系统设置 → 应用 → 默认应用 → 桌面里选择「相框」。
+也可以在系统设置 → 应用 → 默认应用 → 桌面里选择「Simple-PhotoFrame」。
 
 ### 设备要求
 

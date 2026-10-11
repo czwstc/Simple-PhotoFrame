@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">相框</string>
+    <string name="app_name">Simple-PhotoFrame</string>
 
     <!-- 相框 -->
     <string name="settings">设置</string>
